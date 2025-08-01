@@ -8,6 +8,12 @@ const server = Bun.serve({
         const url = new URL(request.url);
         const path = url.pathname.slice(1); // Remove leading '/'
 
+        if (path.startsWith("node_modules")) {
+            return new Response(Bun.file(path), {
+                headers: { "Content-Type": "application/javascript" }
+            })
+        }
+
         if (path.endsWith(".js")) {
             return new Response(Bun.file('./public/' + path), {
                 headers: { "Content-Type": "application/javascript" }

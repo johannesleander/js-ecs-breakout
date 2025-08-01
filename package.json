@@ -1,19 +1,19 @@
 {
   "name": "ape-breakout",
   "module": "index.ts",
-  "type": "module",
-  "private": true,
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "dependencies": {
-    "ape-ecs": "^1.3.1"
-  },
+  "private": true,
   "scripts": {
     "build": "bun build src/index.ts --outdir public",
     "serve": "bun run server.ts --hot"
+  },
+  "type": "module",
+  "dependencies": {
+    "ape-ecs": "github:fritzy/ape-ecs/"
   }
 }

@@ -1,18 +1,18 @@
 import { Ball, PaddleControl, Position, Renderable, Velocity } from "../components.js";
 
 export class MovementSystem extends ApeECS.System {
-    private leftPressed = false;
-    private rightPressed = false;
+    _leftPressed = false;
+    _rightPressed = false;
 
     init() {
         window.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowLeft") this.leftPressed = true;
-            if (e.key === "ArrowRight") this.rightPressed = true;
+            if (e.key === "ArrowLeft") this._leftPressed = true;
+            if (e.key === "ArrowRight") this._rightPressed = true;
         });
 
         window.addEventListener("keyup", (e) => {
-            if (e.key === "ArrowLeft") this.leftPressed = false;
-            if (e.key === "ArrowRight") this.rightPressed = false;
+            if (e.key === "ArrowLeft") this._leftPressed = false;
+            if (e.key === "ArrowRight") this._rightPressed = false;
         });
     }
 
@@ -42,8 +42,8 @@ export class MovementSystem extends ApeECS.System {
 
             if (entity.has(PaddleControl) && velocity && position) {
                 velocity.dx = 0;
-                if (this.leftPressed) velocity.dx = -6;
-                if (this.rightPressed) velocity.dx = 6;
+                if (this._leftPressed) velocity.dx = -6;
+                if (this._rightPressed) velocity.dx = 6;
 
                 position.x += velocity.dx;
                 position.y += velocity.dy;
