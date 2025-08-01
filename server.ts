@@ -4,7 +4,6 @@ const server = Bun.serve({
         if (request.url.endsWith("/") || request.url.endsWith("/index.html")) {
             return new Response(Bun.file("./public/index.html"));
         }
-        // Serve other static files (JS, CSS, etc.)
         const url = new URL(request.url);
         const path = url.pathname.slice(1); // Remove leading '/'
 
@@ -19,8 +18,6 @@ const server = Bun.serve({
                 headers: { "Content-Type": "application/javascript" }
             })
         }
-
-        console.log(path)
 
         if (path && Bun.file(path).size > 0) {
             return new Response(Bun.file('./public/' + path));

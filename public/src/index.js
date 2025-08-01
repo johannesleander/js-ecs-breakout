@@ -1,16 +1,14 @@
+/// <reference path="../../types/ape-ecs-global.d.ts" />
+import 'ape-ecs'
 import { Position, Renderable, Velocity } from "./components.js";
-import { world } from "./world.js";
+import { world } from './world.js';
 
-declare global {
-  interface Window {
-    world: typeof world;
-  }
-}
-
-const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
+const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById("gameCanvas"));
 const ctx = canvas.getContext("2d");
-window.world = world;
 
+/**
+ * Create game entities (paddle and ball)
+ */
 function createEntities() {
   // Paddle
   world.createEntity({
@@ -33,6 +31,9 @@ function createEntities() {
   });
 }
 
+/**
+ * Render all entities with Position and Renderable components
+ */
 function renderEntities() {
   if (!ctx) throw new Error("No canvas found");
 
@@ -50,6 +51,9 @@ function renderEntities() {
   }
 }
 
+/**
+ * Main game loop
+ */
 function gameLoop() {
   world.runSystems("movement");
   world.runSystems("ball-collision");
