@@ -13,5 +13,5 @@ world.registerComponent(Ball);
 world.registerComponent(Brick);
 
 // Systems
-world.registerSystem('movement', MovementSystem);
-world.registerSystem('movement', BallCollisionSystem);
+world.registerSystem('game-loop', MovementSystem);
+world.registerSystem('game-loop', BallCollisionSystem);

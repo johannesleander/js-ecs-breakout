@@ -2,6 +2,10 @@
 import 'ape-ecs'
 import { Position, Renderable, Velocity } from "./components.js";
 import { world } from './world.js';
+/**
+ * A number, or a string containing a number.
+ * @typedef {(`#${string}`)[][]} BrickLayout
+ */
 
 const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById("gameCanvas"));
 const ctx = canvas.getContext("2d");
@@ -29,6 +33,27 @@ function createEntities() {
       "Ball": {},
     },
   });
+
+  /** @type {BrickLayout} */
+  const brickLayout = [
+    ["#fff", "#fff", "#fff"],
+    ["#fff", "#fff", "#fff"],
+    ["#fff", "#fff", "#fff"]
+  ]
+
+  for (const [rowIndex, row] of brickLayout.entries()) {
+    for (const [brickInRowIndex, brickColor] of row.entries()) {
+      if (!brickColor) continue;
+
+      world.createEntity({
+        c: {
+          "Position": { x: 100 + ((brickInRowIndex + 1) * 100), y: 50 + (rowIndex * 30) },
+          "Renderable": { width: 80, height: 20, color: brickColor },
+          "Brick": {}
+        }
+      }); 
+    }
+  }
 }
 
 /**
@@ -38,7 +63,7 @@ function renderEntities() {
   if (!ctx) throw new Error("No canvas found");
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const entities = world.createQuery().fromAll(Position, Velocity).execute();
+  const entities = world.createQuery().fromAll(Position, Renderable).execute();
 
   for (const entity of entities) {
     const position = entity.getOne(Position);
@@ -55,8 +80,7 @@ function renderEntities() {
  * Main game loop
  */
 function gameLoop() {
-  world.runSystems("movement");
-  world.runSystems("ball-collision");
+  world.runSystems("game-loop");
   renderEntities();
   requestAnimationFrame(gameLoop);
 }
