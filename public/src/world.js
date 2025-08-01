@@ -1,4 +1,4 @@
-import { Ball, Brick, PaddleControl, Position, Renderable, Velocity } from './components.js';
+import { Ball, Brick, Paddle, Position, Renderable, Velocity } from './components.js';
 import { MovementSystem } from './systems/movement-system.js';
 import { BallCollisionSystem } from './systems/ball-collision-system.js';
 
@@ -8,7 +8,7 @@ export const world = new ApeECS.World();
 world.registerComponent(Position);
 world.registerComponent(Velocity);
 world.registerComponent(Renderable);
-world.registerComponent(PaddleControl);
+world.registerComponent(Paddle);
 world.registerComponent(Ball);
 world.registerComponent(Brick);
 

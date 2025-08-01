@@ -1,33 +1,35 @@
-import { Ball, PaddleControl, Position, Renderable, Velocity } from '../components.js';
+import { Ball, Brick, Paddle, Position, Renderable, Velocity } from '../components.js';
 
 export class BallCollisionSystem extends ApeECS.System {
-    init() { }
+    init() {
+        this.ballQuery = this.createQuery().fromAll(Ball).persist();
+        this.paddleQuery = this.createQuery().fromAll(Paddle).persist();
+        this.brickQuery = this.createQuery().fromAll(Brick);
+    }
 
     update() {
-        const entities = this.createQuery().fromAll(Position, Velocity, Ball).execute(); // I couldn't get this working in the init method :(
+        const ballEntities = this.ballQuery?.execute() ?? [];
 
-        if (!entities) return;
-
-        for (const entity of entities) {
-            if (!entity.has(Position)) {
-                entity.addComponent({
-                    type: 'Position',
+        for (const ball of ballEntities) {
+            if (!ball.has(Position)) {
+                ball.addComponent({
+                    type: Position,
                     x: 0,
                     y: 0
                 });
             }
-            const position = entity.getOne(Position);
+            const position = ball.getOne(Position);
 
-            if (!entity.has(Velocity)) {
-                entity.addComponent({
-                    type: 'Velocity',
+            if (!ball.has(Velocity)) {
+                ball.addComponent({
+                    type: Velocity,
                     mx: 0,
                     my: 0
                 })
             }
-            const velocity = entity.getOne(Velocity);
+            const velocity = ball.getOne(Velocity);
 
-            if (!entity.has(Ball)) continue;
+            if (!ball.has(Ball)) continue;
             if (!velocity) continue;
             if (!position) continue;
 
@@ -46,28 +48,39 @@ export class BallCollisionSystem extends ApeECS.System {
                 position.y = 0;
             }
 
-            const paddleEntities = this.createQuery().fromAll(Position, Renderable, PaddleControl).execute();
-            for (const paddle of paddleEntities) {
-                const paddlePos = paddle.getOne(Position);
-                const paddleRenderable = paddle.getOne(Renderable)
 
-                const paddleWidth = paddleRenderable?.width;
-                const paddleHeight = paddleRenderable?.height;
-                const ballRadius = entity.getOne(Renderable)?.width;
+            const paddleEntities = this.paddleQuery?.execute() || [];
+            const brickEntities = this.brickQuery?.execute() || [];
 
-                // Simple AABB collision detection
-                if (
-                    paddlePos &&
-                    position.y + ballRadius >= paddlePos.y &&
-                    position.y - ballRadius <= paddlePos.y + paddleHeight &&
-                    position.x + ballRadius >= paddlePos.x &&
-                    position.x - ballRadius <= paddlePos.x + paddleWidth
-                ) {
-                    velocity.dy *= -1;
-                    position.y = paddlePos.y - ballRadius; // Place ball above paddle
+
+            for (const otherEntity of [...paddleEntities, ...brickEntities]) {
+                const otherPosition = otherEntity.getOne(Position);
+                const otherEntityRenderable = otherEntity.getOne(Renderable)
+                const otherWidth = otherEntityRenderable?.width;
+                const otherHeight = otherEntityRenderable?.height;
+
+                const ballRenderable = ball.getOne(Renderable);
+                const ballWidth = ballRenderable?.width;
+
+                if (!(otherPosition instanceof Position) || typeof otherWidth !== "number" || typeof otherHeight !== "number" && typeof ballWidth !== "number") continue;
+
+                const isBallColliding =
+                    position.x < otherPosition.x + otherWidth &&
+                    position.x + ballWidth > otherPosition.x &&
+                    position.y < otherPosition.y + otherHeight &&
+                    position.y + ballWidth > otherPosition.y;
+
+                if (!isBallColliding) continue;
+
+                // Bounce off other entity
+                velocity.dy *= -1;
+
+                // Adjust position to avoid sticking
+
+                if (otherEntity.has(Brick)) {
+                    this.world.removeEntity(otherEntity);
                 }
             }
         }
     }
 }
-

@@ -1,10 +1,12 @@
-import { Ball, PaddleControl, Position, Renderable, Velocity } from "../components.js";
+import { Ball, Paddle, Position, Renderable, Velocity } from "../components.js";
 
 export class MovementSystem extends ApeECS.System {
     _leftPressed = false;
     _rightPressed = false;
 
     init() {
+        this.paddleQuery = this.createQuery().fromAll(Paddle).persist();
+
         window.addEventListener("keydown", (e) => {
             if (e.key === "ArrowLeft") this._leftPressed = true;
             if (e.key === "ArrowRight") this._rightPressed = true;
@@ -17,14 +19,14 @@ export class MovementSystem extends ApeECS.System {
     }
 
     update() {
-        const entities = this.createQuery().fromAll(Position, Velocity).execute(); // I couldn't get this working in the init method :(
+        const entities = this.paddleQuery?.execute();
 
         if (!entities) return;
 
         for (const entity of entities) {
             if (!entity.has(Position)) {
                 entity.addComponent({
-                    type: 'Position',
+                    type: Position,
                     x: 0,
                     y: 0
                 });
@@ -33,23 +35,24 @@ export class MovementSystem extends ApeECS.System {
 
             if (!entity.has(Velocity)) {
                 entity.addComponent({
-                    type: 'Velocity',
+                    type: Velocity,
                     mx: 0,
                     my: 0
                 })
             }
             const velocity = entity.getOne(Velocity);
 
-            if (entity.has(PaddleControl) && velocity && position) {
-                velocity.dx = 0;
-                if (this._leftPressed) velocity.dx = -6;
-                if (this._rightPressed) velocity.dx = 6;
+            if (!entity.has(Paddle) || !velocity || !position) continue;
 
-                position.x += velocity.dx;
-                position.y += velocity.dy;
+            velocity.dx = 0;
 
-                position.x = Math.max(0, Math.min(position.x, 800));
-            }
+            if (this._leftPressed) velocity.dx = -6;
+            if (this._rightPressed) velocity.dx = 6;
+
+            position.x += velocity.dx;
+            position.y += velocity.dy;
+
+            position.x = Math.max(0, Math.min(position.x, 800));
         }
     }
 }
