@@ -77,7 +77,6 @@ export class BallCollisionSystem extends ApeECS.System {
                     const speedIncrease = 1.05
                     const maxBounceIncreaseTimes = 20
                     const bounceCount = ball.getOne(BounceCount);
-                    console.log({ bounceCount: bounceCount.value })
 
                     if (bounceCount.value ?? 0 < maxBounceIncreaseTimes) {
                         velocity.dx, velocity.dy *= speedIncrease;
