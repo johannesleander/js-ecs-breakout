@@ -20,7 +20,7 @@ function createEntities() {
     id: 'Frame',
     c: {
       /** @type {FrameInfoProps} */
-      "FrameInfo": { deltaTime: 0, lastUpdate: Date.now() }
+      "FrameInfo": { deltaTime: 0, lastUpdate: performance.now() }
     }
   })
 
@@ -48,7 +48,7 @@ function createEntities() {
         y: 300,
       },
       /** @type {VelocityProps} */
-      "Velocity": { dx: 3, dy: 3 },
+      "Velocity": { dx: 120, dy: 120 },
       /** @type {RenderableProps} */
       "Renderable": { width: 10, height: 10, color: "red" },
       /** @type {ColliderProps} */

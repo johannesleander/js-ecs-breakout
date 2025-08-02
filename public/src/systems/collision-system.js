@@ -49,26 +49,6 @@ export class CollisionSystem extends ApeECS.System {
                 if (collision.normal.x !== 0) velocity.dx *= -1;
                 if (collision.normal.y !== 0) velocity.dy *= -1;
 
-                // if (entity.has(Ball)) {
-                //     // Simple bounce logic: reverse direction depending on collision side
-                //     const overlapLeft = position.x + collider.width - otherPosition.x;
-                //     const overlapRight = otherPosition.x + otherCollider.width - position.x;
-                //     const overlapTop = position.y + collider.height - otherPosition.y;
-                //     const overlapBottom = otherPosition.y + otherCollider.height - position.y;
-
-                //     const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
-
-                //     if (minOverlap === overlapLeft) {
-                //         velocity.dx = -Math.abs(velocity.dx);
-                //     } else if (minOverlap === overlapRight) {
-                //         velocity.dx = Math.abs(velocity.dx);
-                //     } else if (minOverlap === overlapTop) {
-                //         velocity.dy = -Math.abs(velocity.dy);
-                //     } else if (minOverlap === overlapBottom) {
-                //         velocity.dy = Math.abs(velocity.dy);
-                //     }
-                // }
-
                 if (entity.has(Ball) && otherEntity.has(Brick)) {
                     this.world.removeEntity(otherEntity);
                 }

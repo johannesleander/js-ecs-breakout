@@ -1,4 +1,4 @@
-import { Position, Velocity } from "../components.js";
+import { Ball, Position, Velocity } from "../components.js";
 import { world } from "../world.js";
 
 export class MovementSystem extends ApeECS.System {
@@ -16,16 +16,18 @@ export class MovementSystem extends ApeECS.System {
             if (!velocity) continue;
             if (!position) continue;
 
-            position.x += velocity.dx;
-            position.y += velocity.dy;
-            // position.x = position.x + velocity.dx * deltaTime
-            // position.y = position.y + velocity.dy * deltaTime
+            position.x = position.x + velocity.dx * deltaTime
+            position.y = position.y + velocity.dy * deltaTime
 
 
-            console.log(1, position.x);
-            console.log(2, position.x + velocity.dx);
-            console.log(3, position.x + velocity.dx * deltaTime);
-            // console.log(velocity.dy * deltaTime + position.y);
+            if (entity.has(Ball)) {
+                // console.log(position.x)
+                console.log('velocity.dx:', velocity.dx, 'type:', typeof velocity.dx);
+                console.log('deltaTime:', deltaTime);
+                // console.log(position.x);
+                // console.log(2, position.x + velocity.dx);
+                // console.log(3, position.x + velocity.dx * deltaTime);
+            }
         }
     }
 }
