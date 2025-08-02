@@ -1,4 +1,4 @@
-import { Ball, Paddle, Position, Renderable, Velocity } from "../components.js";
+import { Paddle, Position, Velocity } from "../components.js";
 
 export class MovementSystem extends ApeECS.System {
     _leftPressed = false;

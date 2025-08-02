@@ -2,7 +2,11 @@
   "name": "ape-breakout",
   "module": "index.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@eslint/js": "^9.32.0",
+    "@types/bun": "latest",
+    "eslint": "^9.32.0",
+    "eslint-plugin-import": "^2.32.0",
+    "globals": "^16.3.0"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -10,7 +14,9 @@
   "private": true,
   "scripts": {
     "build": "bun build src/index.ts --outdir public",
-    "serve": "bun run server.ts --hot"
+    "serve": "bun run server.ts --hot",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix"
   },
   "type": "module",
   "dependencies": {

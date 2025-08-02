@@ -1,6 +1,7 @@
 import { Ball, Brick, Paddle, Position, Renderable, Velocity } from './components.js';
 import { MovementSystem } from './systems/movement-system.js';
 import { BallCollisionSystem } from './systems/ball-collision-system.js';
+import { RenderSystem } from './systems/render-system.js';
 
 export const world = new ApeECS.World();
 
@@ -15,3 +16,4 @@ world.registerComponent(Brick);
 // Systems
 world.registerSystem('game-loop', MovementSystem);
 world.registerSystem('game-loop', BallCollisionSystem);
+world.registerSystem('game-loop', RenderSystem);

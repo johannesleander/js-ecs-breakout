@@ -11,22 +11,7 @@ export class BallCollisionSystem extends ApeECS.System {
         const ballEntities = this.ballQuery?.execute() ?? [];
 
         for (const ball of ballEntities) {
-            if (!ball.has(Position)) {
-                ball.addComponent({
-                    type: Position,
-                    x: 0,
-                    y: 0
-                });
-            }
             const position = ball.getOne(Position);
-
-            if (!ball.has(Velocity)) {
-                ball.addComponent({
-                    type: Velocity,
-                    mx: 0,
-                    my: 0
-                })
-            }
             const velocity = ball.getOne(Velocity);
 
             if (!ball.has(Ball)) continue;
@@ -79,6 +64,15 @@ export class BallCollisionSystem extends ApeECS.System {
 
                 if (otherEntity.has(Brick)) {
                     this.world.removeEntity(otherEntity);
+                }
+
+                if (otherEntity.has(Paddle)) {
+                    // Change x direction based on where on the paddle the ball was struck
+                    const paddleCenter = otherPosition.x + (otherWidth / 2);
+                    const ballCenter = position.x + (ballWidth / 2);
+                    const offset = ballCenter - paddleCenter;
+                    const bounceFactor = 0.1; // Adjust this value to change bounce sensitivity
+                    velocity.dx = offset * bounceFactor;
                 }
             }
         }
