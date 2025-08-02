@@ -25,7 +25,7 @@ const server = Bun.serve({
         // Fallback: 404
         return new Response("Not found", { status: 404 });
     },
-    port: 3000,
+    port: 3000
 });
 
 console.log(`Server running at http://localhost:${server.port}`);
