@@ -48,7 +48,7 @@ function createEntities() {
         y: 300,
       },
       /** @type {VelocityProps} */
-      "Velocity": { dx: 120, dy: 120 },
+      "Velocity": { dx: Math.random() > 0.5 ? 120 : -120, dy: Math.random() > 0.5 ? 120 : -120 },
       /** @type {RenderableProps} */
       "Renderable": { width: 10, height: 10, color: "red" },
       /** @type {ColliderProps} */

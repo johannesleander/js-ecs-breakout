@@ -1,23 +1,21 @@
-import { Position, Collider, Brick, Paddle, Ball, Pit, Velocity, BounceCount } from '../components.js';
+import { Position, Collider, Brick, Ball, Pit, Velocity } from '../components.js';
 
 export class CollisionSystem extends ApeECS.System {
     init() {
-        this.collidersQuery = this.world.createQuery().fromAll(Collider, Position, Velocity).persist();
+        this.collidersQuery = this.world.createQuery().fromAll(Collider, Position).persist();
     }
 
     update() {
         const entities = this.collidersQuery.execute();
 
         for (const entity of entities) {
-            if (!entity.has(Ball)) continue;
-
             const collider = entity.getOne(Collider);
             const position = entity.getOne(Position);
             const velocity = entity.getOne(Velocity);
 
             if (!collider) throw new Error('No Collider found');
             if (!position) throw new Error('No Position found');
-            if (!velocity) throw new Error('No Velocity found');
+            if (!velocity) continue // static objects can't bounce 🤷
 
             for (const otherEntity of entities) {
                 if (entity.id === otherEntity.id) continue;
@@ -40,6 +38,7 @@ export class CollisionSystem extends ApeECS.System {
                 );
 
                 if (!collision) continue; // No collision this frame
+                console.log(`${entity.id} collided ${otherEntity.id}`)
 
                 // Move to collision point
                 position.x += velocity.dx * deltaTime * collision.time;
@@ -58,29 +57,6 @@ export class CollisionSystem extends ApeECS.System {
                     this.world.removeEntity(entity);
                     throw new Error("You died! (This shouldn't be an error)")
                 }
-
-                if (entity.has(Ball) && otherEntity.has(Paddle)) {
-                    const velocity = entity.getOne(Velocity);
-                    // Bounce off other entity
-                    velocity.dy *= -1;
-                    // Change x direction based on where on the paddle the ball was struck
-                    const paddleCenter = otherPosition.x + (otherCollider.width / 2);
-                    const ballCenter = position.x + (collider.width / 2);
-                    const offset = ballCenter - paddleCenter;
-                    const horizontalBounceFactor = 0.05;
-                    velocity.dx = offset * horizontalBounceFactor
-
-                    const bounceCount = entity.getOne(BounceCount);
-                    if (!bounceCount) throw new Error('No BounceCount found')
-                    const maxBounceIncreaseTimes = 20
-
-                    if (bounceCount.value ?? 0 < maxBounceIncreaseTimes) {
-                        const speedIncrease = 1.05
-                        velocity.dx *= speedIncrease;
-                        velocity.dy *= speedIncrease;
-                        bounceCount.value += 1
-                    }
-                }
             }
         }
     }
@@ -97,10 +73,13 @@ export class CollisionSystem extends ApeECS.System {
  * @returns 
  */
 function sweptCollisionDetection(movingPos, velocity, size, staticPos, staticSize, deltaTime) {
+    const moveX = velocity.dx * deltaTime;
+    const moveY = velocity.dy * deltaTime;
+
     const entry = {};
     const exit = {};
 
-    if (velocity.dx > 0) {
+    if (moveX > 0) {
         entry.x = staticPos.x - (movingPos.x + size.width);
         exit.x = (staticPos.x + staticSize.width) - movingPos.x;
     } else {
@@ -108,7 +87,7 @@ function sweptCollisionDetection(movingPos, velocity, size, staticPos, staticSiz
         exit.x = staticPos.x - (movingPos.x + size.width);
     }
 
-    if (velocity.dy > 0) {
+    if (moveY > 0) {
         entry.y = staticPos.y - (movingPos.y + size.height);
         exit.y = (staticPos.y + staticSize.height) - movingPos.y;
     } else {
@@ -116,31 +95,29 @@ function sweptCollisionDetection(movingPos, velocity, size, staticPos, staticSiz
         exit.y = staticPos.y - (movingPos.y + size.height);
     }
 
-    const entryTimeX = velocity.dx === 0 ? -Infinity : entry.x / (velocity.dx * deltaTime);
-    const entryTimeY = velocity.dy === 0 ? -Infinity : entry.y / (velocity.dy * deltaTime);
-    const exitTimeX = velocity.dx === 0 ? Infinity : exit.x / (velocity.dx * deltaTime);
-    const exitTimeY = velocity.dy === 0 ? Infinity : exit.y / (velocity.dy * deltaTime);
+    const entryTimeX = moveX === 0 ? -Infinity : entry.x / moveX;
+    const entryTimeY = moveY === 0 ? -Infinity : entry.y / moveY;
+    const exitTimeX = moveX === 0 ? Infinity : exit.x / moveX;
+    const exitTimeY = moveY === 0 ? Infinity : exit.y / moveY;
 
     const entryTime = Math.max(entryTimeX, entryTimeY);
     const exitTime = Math.min(exitTimeX, exitTimeY);
 
-    // No collision if entry is after exit or out of bounds
     if (entryTime > exitTime || entryTime < 0 || entryTime > 1) {
         return null;
     }
 
-    // Determine normal of the collision
     let normalX = 0;
     let normalY = 0;
 
     if (entryTimeX > entryTimeY) {
-        normalX = velocity.dx < 0 ? 1 : -1;
+        normalX = moveX < 0 ? 1 : -1;
     } else {
-        normalY = velocity.dy < 0 ? 1 : -1;
+        normalY = moveY < 0 ? 1 : -1;
     }
 
     return {
         time: entryTime,
-        normal: { x: normalX, y: normalY },
+        normal: { x: normalX, y: normalY }
     };
 }
