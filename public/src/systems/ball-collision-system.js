@@ -33,10 +33,8 @@ export class BallCollisionSystem extends ApeECS.System {
                 position.y = 0;
             }
 
-
             const paddleEntities = this.paddleQuery?.execute() || [];
             const brickEntities = this.brickQuery?.execute() || [];
-
 
             for (const otherEntity of [...paddleEntities, ...brickEntities]) {
                 const otherPosition = otherEntity.getOne(Position);
@@ -77,7 +75,8 @@ export class BallCollisionSystem extends ApeECS.System {
                     const bounceCount = ball.getOne(BounceCount);
 
                     if (bounceCount.value ?? 0 < maxBounceIncreaseTimes) {
-                        velocity.dx, velocity.dy *= speedIncrease;
+                        velocity.dx *= speedIncrease;
+                        velocity.dy *= speedIncrease;
                         bounceCount.value += 1
                     }
                 }

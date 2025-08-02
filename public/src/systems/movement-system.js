@@ -1,59 +1,31 @@
-import { Paddle, Position, Velocity } from "../components.js";
+import { Position, Velocity } from "../components.js";
+import { world } from "../world.js";
 
 export class MovementSystem extends ApeECS.System {
-    _leftPressed = false;
-    _rightPressed = false;
-
     init() {
-        this.paddleQuery = this.createQuery().fromAll(Paddle).persist();
-
-        window.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowLeft") this._leftPressed = true;
-            if (e.key === "ArrowRight") this._rightPressed = true;
-        });
-
-        window.addEventListener("keyup", (e) => {
-            if (e.key === "ArrowLeft") this._leftPressed = false;
-            if (e.key === "ArrowRight") this._rightPressed = false;
-        });
+        this.movableQuery = world.createQuery().fromAll(Position, Velocity).persist();
     }
-
     update() {
-        const entities = this.paddleQuery?.execute();
-
-        if (!entities) return;
+        const entities = this.movableQuery.execute();
+        const deltaTime = this.world.getEntity('Frame').c['FrameInfo'].deltaTime;
 
         for (const entity of entities) {
-            if (!entity.has(Position)) {
-                entity.addComponent({
-                    type: Position,
-                    x: 0,
-                    y: 0
-                });
-            }
             const position = entity.getOne(Position);
-
-            if (!entity.has(Velocity)) {
-                entity.addComponent({
-                    type: Velocity,
-                    mx: 0,
-                    my: 0
-                })
-            }
             const velocity = entity.getOne(Velocity);
 
-            if (!entity.has(Paddle) || !velocity || !position) continue;
-
-            velocity.dx = 0;
-
-            if (this._leftPressed) velocity.dx = -6;
-            if (this._rightPressed) velocity.dx = 6;
+            if (!velocity) continue;
+            if (!position) continue;
 
             position.x += velocity.dx;
             position.y += velocity.dy;
+            // position.x = position.x + velocity.dx * deltaTime
+            // position.y = position.y + velocity.dy * deltaTime
 
-            position.x = Math.max(0, Math.min(position.x, 800));
+
+            console.log(1, position.x);
+            console.log(2, position.x + velocity.dx);
+            console.log(3, position.x + velocity.dx * deltaTime);
+            // console.log(velocity.dy * deltaTime + position.y);
         }
     }
 }
-
