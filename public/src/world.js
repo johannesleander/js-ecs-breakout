@@ -5,6 +5,7 @@ import { CollisionSystem } from './systems/collision-system.js';
 import { FrameInfoSystem } from './systems/frame-info-system.js';
 import { MovementSystem } from './systems/movement-system.js';
 import { RenderSystem } from './systems/render-system.js';
+import { WinSystem } from './systems/win-system.js';
 
 export const world = new ApeECS.World();
 
@@ -28,3 +29,4 @@ world.registerSystem('game-loop', CollisionSystem)
 world.registerSystem('game-loop', RenderSystem);
 world.registerSystem('game-loop', MovementSystem)
 world.registerSystem('game-loop', FrameInfoSystem)
+world.registerSystem('game-loop', WinSystem)

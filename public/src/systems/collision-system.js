@@ -53,9 +53,8 @@ export class CollisionSystem extends ApeECS.System {
                 }
 
                 if (entity.has(Ball) && otherEntity.has(Pit)) {
-                    // Death
                     this.world.removeEntity(entity);
-                    throw new Error("You died! (This shouldn't be an error)")
+                    alert('You lost :(') 
                 }
             }
         }
