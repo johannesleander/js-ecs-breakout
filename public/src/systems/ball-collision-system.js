@@ -60,8 +60,6 @@ export class BallCollisionSystem extends ApeECS.System {
                 // Bounce off other entity
                 velocity.dy *= -1;
 
-                // Adjust position to avoid sticking
-
                 if (otherEntity.has(Brick)) {
                     this.world.removeEntity(otherEntity);
                 }
