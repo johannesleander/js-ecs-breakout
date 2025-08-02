@@ -1,4 +1,4 @@
-import { Ball, Brick, Paddle, Position, Renderable, Velocity } from '../components.js';
+import { Ball, Brick, Paddle, Position, Renderable, Velocity, BounceCount } from '../components.js';
 
 export class BallCollisionSystem extends ApeECS.System {
     init() {
@@ -8,7 +8,7 @@ export class BallCollisionSystem extends ApeECS.System {
     }
 
     update() {
-        const ballEntities = this.ballQuery?.execute() ?? [];
+        const ballEntities = this.ballQuery?.execute();
 
         for (const ball of ballEntities) {
             const position = ball.getOne(Position);
@@ -71,8 +71,18 @@ export class BallCollisionSystem extends ApeECS.System {
                     const paddleCenter = otherPosition.x + (otherWidth / 2);
                     const ballCenter = position.x + (ballWidth / 2);
                     const offset = ballCenter - paddleCenter;
-                    const bounceFactor = 0.1; // Adjust this value to change bounce sensitivity
-                    velocity.dx = offset * bounceFactor;
+                    const horizontalBounceFactor = 0.05;
+                    velocity.dx = offset * horizontalBounceFactor
+
+                    const speedIncrease = 1.05
+                    const maxBounceIncreaseTimes = 20
+                    const bounceCount = ball.getOne(BounceCount);
+                    console.log({ bounceCount: bounceCount.value })
+
+                    if (bounceCount.value ?? 0 < maxBounceIncreaseTimes) {
+                        velocity.dx, velocity.dy *= speedIncrease;
+                        bounceCount.value += 1
+                    }
                 }
             }
         }

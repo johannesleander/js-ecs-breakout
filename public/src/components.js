@@ -41,6 +41,18 @@ Renderable.properties = {
   color: "#fff",
 }
 
+export class BounceCount extends ApeECS.Component { };
+
+/**
+ * @typedef {Object} BounceCountProps
+ * @property {number} value
+ */
+
+/** @type {BounceCountProps} */
+BounceCount.properties = {
+  value: 0,
+}
+
 export class Paddle extends ApeECS.Component { };
 export class Ball extends ApeECS.Component { };
 export class Brick extends ApeECS.Component { };

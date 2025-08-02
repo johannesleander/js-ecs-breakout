@@ -6,6 +6,7 @@ import { world } from './world.js';
  * @typedef {import("./components.js").PositionProps} PositionProps
  * @typedef {import("./components.js").VelocityProps} VelocityProps
  * @typedef {import("./components.js").RenderableProps} RenderableProps
+ * @typedef {import("./components.js").BounceCountProps} BounceCountProps
  */
 
 function createEntities() {
@@ -34,6 +35,8 @@ function createEntities() {
       "Velocity": { dx: 3, dy: 3 },
       /** @type {RenderableProps} */
       "Renderable": { width: 10, height: 10, color: "red" },
+      /** @type {BounceCountProps} */
+      "BounceCount": { value: 0 },
       "Ball": {},
     },
   });
