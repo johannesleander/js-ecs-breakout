@@ -13,8 +13,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "bun build src/index.ts --outdir public",
-    "serve": "bun run server.ts --hot",
+    "serve": "bun run server.js --hot",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix"
   },
