@@ -24,7 +24,6 @@ world.registerComponent(Pit)
 
 // Systems
 world.registerSystem('game-loop', PlayerControllerSystem);
-// world.registerSystem('game-loop', BallCollisionSystem);
 world.registerSystem('game-loop', CollisionSystem)
 world.registerSystem('game-loop', RenderSystem);
 world.registerSystem('game-loop', MovementSystem)
