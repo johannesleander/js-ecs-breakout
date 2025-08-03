@@ -1,6 +1,7 @@
 /// <reference path="../../types/ape-ecs-global.d.ts" />
 import 'ape-ecs'
 import { world } from './world.js';
+import { Ball, Brick, Pit } from './components.js';
 
 export const getScreenHeight = () => 600
 export const getScreenWidth = () => 800
@@ -34,8 +35,8 @@ function createEntities() {
       /** @type {RenderableProps} */
       "Renderable": { width: 100, height: 20, color: "hotpink" },
       /** @type {ColliderProps} */
-      "Collider": { width: 100, height: 20 },
-      "Paddle": {},
+      "Collider": { width: 100, height: 20, excludeComponents: [Brick, Ball, Pit] },
+      "PaddleController": {},
     },
   });
 

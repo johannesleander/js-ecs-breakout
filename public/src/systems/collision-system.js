@@ -19,6 +19,7 @@ export class CollisionSystem extends ApeECS.System {
 
             for (const otherEntity of entities) {
                 if (entity.id === otherEntity.id) continue;
+                if (collider.excludeComponents?.some(c => otherEntity.has(c))) continue;
 
                 const otherCollider = otherEntity.getOne(Collider)
                 const otherPosition = otherEntity.getOne(Position);
@@ -38,7 +39,7 @@ export class CollisionSystem extends ApeECS.System {
                 );
 
                 if (!collision) continue; // No collision this frame
-                console.log(`${entity.id} collided ${otherEntity.id}`)
+                console.log(`${entity.c} collided ${otherEntity.c}`);
 
                 // Move to collision point
                 position.x += velocity.dx * deltaTime * collision.time;
@@ -50,11 +51,12 @@ export class CollisionSystem extends ApeECS.System {
 
                 if (entity.has(Ball) && otherEntity.has(Brick)) {
                     this.world.removeEntity(otherEntity);
+                    this.world.runSystems('win');
                 }
 
                 if (entity.has(Ball) && otherEntity.has(Pit)) {
                     this.world.removeEntity(entity);
-                    alert('You lost :(') 
+                    this.world.runSystems('lose');
                 }
             }
         }
@@ -65,9 +67,9 @@ export class CollisionSystem extends ApeECS.System {
  * 
  * @param {import('../components.js').PositionProps} movingPos 
  * @param {import('../components.js').VelocityProps} velocity 
- * @param {import('../components.js').ColliderProps} size 
+ * @param {Pick<import('../components.js').ColliderProps, 'height' | 'width'>} size 
  * @param {import('../components.js').PositionProps} staticPos 
- * @param {import('../components.js').ColliderProps} staticSize 
+ * @param {Pick<import('../components.js').ColliderProps, 'height' | 'width'>} staticSize 
  * @param {number} deltaTime 
  * @returns 
  */

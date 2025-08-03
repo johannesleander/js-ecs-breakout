@@ -73,12 +73,14 @@ export class Collider extends ApeECS.Component { };
  * @typedef {Object} ColliderProps
  * @property {number} width
  * @property {number} height
+ * @property {Array<typeof import('ape-ecs').Component>} [excludeComponents]
  */
 
 /** @type {ColliderProps} */
 Collider.properties = {
   width: 0,
-  height: 0
+  height: 0,
+  excludeComponents: []
 }
 
 export class FrameInfo extends ApeECS.Component { };
@@ -95,7 +97,7 @@ FrameInfo.properties = {
   lastUpdate: 0
 }
 
-export class Paddle extends ApeECS.Component { };
+export class PaddleController extends ApeECS.Component { };
 export class Ball extends ApeECS.Component { };
 export class Brick extends ApeECS.Component { };
 export class Wall extends ApeECS.Component { };
