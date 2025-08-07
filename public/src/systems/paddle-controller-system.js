@@ -1,4 +1,4 @@
-import { PaddleController, Position, Velocity } from "../components.js";
+import { PaddleController, Velocity } from "../components.js";
 
 export class PaddleControllerSystem extends ApeECS.System {
     _leftPressed = false;
@@ -20,11 +20,7 @@ export class PaddleControllerSystem extends ApeECS.System {
 
     update() {
         for (const entity of this.query.execute()) {
-            const position = entity.getOne(Position);
             const velocity = entity.getOne(Velocity);
-
-            if (!position) continue;
-            if (!velocity) continue;
 
             const speed = 200;
             if (this._leftPressed) { velocity.dx = -speed }

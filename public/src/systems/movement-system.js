@@ -12,13 +12,6 @@ export class MovementSystem extends ApeECS.System {
             const position = entity.getOne(Position);
             const velocity = entity.getOne(Velocity);
 
-            if (!velocity) continue;
-            if (!position) continue;
-
-            if (entity.has(PaddleController)) {
-                console.log(position.x)
-            }
-
             position.x += velocity.dx * deltaTime
             position.y += velocity.dy * deltaTime
         }

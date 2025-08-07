@@ -2,34 +2,45 @@ import { Position, Collider, Brick, Ball, Pit, Velocity } from '../components.js
 
 export class CollisionSystem extends ApeECS.System {
     init() {
-        this.collidersQuery = this.world.createQuery().fromAll(Collider, Position).persist();
+        this.query = this.world.createQuery().fromAll(Collider, Position).persist();
     }
 
     update() {
-        const entities = this.collidersQuery.execute();
+        const entities = Array.from(this.query.execute());
+        const entitiesMap = new Map(entities.map(entity => {
+            const data = {
+                entity,
+                collider: entity.getOne(Collider),
+                position: entity.getOne(Position),
+                velocity: entity.getOne(Velocity),
+            }
 
-        for (const entity of entities) {
-            const collider = entity.getOne(Collider);
-            const position = entity.getOne(Position);
-            const velocity = entity.getOne(Velocity);
+            return [entity.id, data]
+        }))
 
-            if (!collider) throw new Error('No Collider found');
-            if (!position) throw new Error('No Position found');
-            if (!velocity) continue // static objects can't bounce 🤷
+        const movableEntities = entities.filter(e => e.has(Velocity)).map(e => entitiesMap.get(e.id));
+        const staticEntities = entities.filter(e => !e.has(Velocity)).map(e => entitiesMap.get(e.id));
 
-            for (const otherEntity of entities) {
+
+        for (const { entity, collider, position, velocity } of movableEntities) {
+            for (const other of [...movableEntities, ...staticEntities]) {
+                const { entity: otherEntity, collider: otherCollider, position: otherPosition } = other
+
                 if (entity.id === otherEntity.id) continue;
                 if (collider.excludeComponents?.some(c => otherEntity.has(c))) continue;
 
-                const otherCollider = otherEntity.getOne(Collider)
-                const otherPosition = otherEntity.getOne(Position);
-
-                if (!otherCollider) throw new Error('No Collider found')
-                if (!otherPosition) throw new Error('No Position found')
-
                 const deltaTime = this.world.getEntity('Frame').c['FrameInfo'].deltaTime;
 
-                const collision = sweptCollisionDetection(
+                const simpleCollision = aabbOverlap(
+                    { x: position.x, y: position.y },
+                    { width: collider.width, height: collider.height },
+                    { x: otherPosition.x, y: otherPosition.y },
+                    { width: otherCollider.width, height: otherCollider.height },
+                )
+
+                if (simpleCollision) continue
+
+                const sweptCollision = sweptCollisionDetection(
                     { x: position.x, y: position.y },
                     { dx: velocity.dx, dy: velocity.dy },
                     { width: collider.width, height: collider.height },
@@ -38,16 +49,15 @@ export class CollisionSystem extends ApeECS.System {
                     deltaTime
                 );
 
-                if (!collision) continue; // No collision this frame
-                console.log(`${entity.c} collided ${otherEntity.c}`);
+                if (!sweptCollision) continue; // No collision this frame
 
                 // Move to collision point
-                position.x += velocity.dx * deltaTime * collision.time;
-                position.y += velocity.dy * deltaTime * collision.time;
+                position.x += velocity.dx * deltaTime * sweptCollision.time;
+                position.y += velocity.dy * deltaTime * sweptCollision.time;
 
                 // Reflect the velocity
-                if (collision.normal.x !== 0) velocity.dx *= -1;
-                if (collision.normal.y !== 0) velocity.dy *= -1;
+                if (sweptCollision.normal.x !== 0) velocity.dx *= -1;
+                if (sweptCollision.normal.y !== 0) velocity.dy *= -1;
 
                 if (entity.has(Ball) && otherEntity.has(Brick)) {
                     this.world.removeEntity(otherEntity);
@@ -121,4 +131,21 @@ function sweptCollisionDetection(movingPos, velocity, size, staticPos, staticSiz
         time: entryTime,
         normal: { x: normalX, y: normalY }
     };
+}
+
+/**
+ * 
+ * @param {import('../components.js').PositionProps} pos1 
+ * @param {import('../components.js').ColliderProps} size1 
+ * @param {import('../components.js').PositionProps} pos2 
+ * @param {import('../components.js').ColliderProps} size2 
+ * @returns 
+ */
+function aabbOverlap(pos1, size1, pos2, size2) {
+    return (
+        pos1.x + size1.width < pos2.x ||
+        pos1.x > pos2.x + size2.width ||
+        pos1.y + size1.height < pos2.y ||
+        pos1.y > pos2.y + size2.height
+    );
 }
